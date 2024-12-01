@@ -53,10 +53,11 @@ public class OllamaService : IOllamaService
             await foreach (var stream in ollama.GenerateAsync(prompt))
             {
                 // Получаем часть данных и записываем в поток
-                var responseData = stream.Response;
+                var responseData = stream?.Response;
 
                 // Логгируем ответ
-                logger.LogDebug("Получена часть ответа: {ResponseData}", responseData);
+                //logger.LogInformation("Получена часть ответа: {ResponseData}", responseData);
+                Console.Write(responseData);
 
                 // Записываем в outputStream
                 var buffer = Encoding.UTF8.GetBytes(responseData);

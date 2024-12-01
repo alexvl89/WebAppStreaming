@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
+using System.Text.Json.Serialization;
 using WebAppStreaming.Services;
 
 namespace WebAppStreaming.Controllers;
@@ -78,8 +79,17 @@ public class Test : ControllerBase
 
 
     [HttpPost("ollama/stream")]
-    public async Task StreamOllamaResponse([FromBody] string prompt)
+    public async Task StreamOllamaResponse([FromBody] PromptRequest value)
     {
+        if(value==null)
+        {
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+            await Response.WriteAsync("Входящий объект не может быть пустым.");
+            return;
+        }
+
+        var prompt = value?.Prompt;
+
         if (string.IsNullOrWhiteSpace(prompt))
         {
             Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -103,5 +113,14 @@ public class Test : ControllerBase
             Response.StatusCode = StatusCodes.Status500InternalServerError;
             await Response.WriteAsync($"Ошибка: {ex.Message}");
         }
+    }
+
+
+    public class PromptRequest
+    {
+        [JsonPropertyName("prompt")]
+        public string? Prompt { get; set; }
+        [JsonPropertyName("model")]
+        public string? Model { get; set; }
     }
 }
